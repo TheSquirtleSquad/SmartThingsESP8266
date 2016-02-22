@@ -15,7 +15,7 @@
  * Date: 2016-02-16
  * Derived from Wemo Switch 
  * 	- Author: Juan Risso (SmartThings)
- *  - Date: 2015-10-11
+ *  - Date: 2015-10-11 
  * 
  */
  metadata {
