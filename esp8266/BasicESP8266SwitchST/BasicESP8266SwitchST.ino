@@ -22,7 +22,10 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266SSDP.h>
-
+#include <Servo.h> 
+ 
+Servo myservo;  // create servo object to control a servo 
+                // twelve servo objects can be created on most boards
 
 const char* ssid = "PLACE SSID HERE";
 const char* password = "PLACE PASSWORD HERE";
@@ -30,7 +33,7 @@ const char* password = "PLACE PASSWORD HERE";
 
 ESP8266WebServer server(80);
 
-int state = 1;
+int state = 0;
 
 void handleRoot() {
   if (state == 1)
@@ -41,7 +44,16 @@ void handleRoot() {
 
 void handleOn() {
   //*****************ADD Custom Code Here**********************
-  digitalWrite(BUILTIN_LED, LOW);  
+  int pos;
+  if (state == 0)
+     {  
+        for(pos = 5; pos < 175; pos += 1) // goes from 0 degrees to 180 degrees 
+        {                                  // in steps of 1 degree 
+          myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+          delay(5);                       // waits 15ms for the servo to reach the position 
+        } 
+     }
+     
   state = 1;
   //****************End Turn on Device Code********************
   server.send(200, "text/html", "<html><body>on</body></html>");
@@ -50,8 +62,17 @@ void handleOn() {
 
 
 void handleOff() {
+  int pos;
   //*****************ADD Custom Code Here**********************
-  digitalWrite(BUILTIN_LED, HIGH);  
+  if (state == 1)
+     {
+        for(pos = 175; pos>0; pos-=1)     // goes from 180 degrees to 0 degrees 
+        {                                  // in steps of 1 degree 
+          myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+          delay(5);                       // waits 15ms for the servo to reach the position 
+        } 
+     }
+     
   state = 0;
   //****************End Turn off Device Code********************
   server.send(200, "text/html", "<html><body>off</body></html>");
@@ -69,6 +90,8 @@ void handleNotFound(){
 }
 
 void setup(void){
+  
+  myservo.attach(2);  // attaches the servo on GIO2 to the servo object 
   WiFi.begin(ssid, password);
   
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
